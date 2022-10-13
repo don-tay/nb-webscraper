@@ -12,7 +12,6 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 import requests
 import schedule
 from dotenv import load_dotenv
@@ -59,7 +58,7 @@ chrome_options.add_argument("--headless")
 
 # set up chrome driver
 # ! NB: adjust accordingly to your own path, or use webdriver_manager
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+driver = webdriver.Chrome(service=Service(), options=chrome_options)
 
 
 def send_email(res_str: str):
