@@ -1,6 +1,6 @@
-# Webscraper
+# NB Web scraper
 
-Schedulable webscrapping tool in Python + Selenium.
+Schedulable web scraping tool in Python + Selenium.
 
 ## Pre-requisite
 
@@ -27,4 +27,4 @@ source venv/bin/activate
 python3 webscraper.py
 ```
 
-> NB: Specific fields in webscrapper may need to be configured due to platform differences , these fields have been highlighted in the code comments.
+> NB: Specific fields in web scraper may need to be configured due to platform differences , these fields have been highlighted in the code comments.
