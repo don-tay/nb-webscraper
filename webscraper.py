@@ -2,6 +2,7 @@
 # the 1st 2 html tags with class 'analytic-item'
 
 from datetime import datetime
+import logging
 import os
 import time
 from zoneinfo import ZoneInfo
@@ -19,6 +20,27 @@ from dotenv import load_dotenv
 # load dotenv file
 load_dotenv()
 
+# create logs/ dir if not exists
+if not os.path.exists('logs'):
+    os.makedirs('logs')
+
+# init logging
+logger = logging.getLogger('nb-webscraper')
+logger.setLevel(logging.INFO)
+info_fh = logging.FileHandler('logs/nb-webscraper.log')
+info_fh.setLevel(logging.INFO)
+info_fh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+logger.addHandler(info_fh)
+error_fh = logging.FileHandler('logs/nb-webscraper-error.log')
+error_fh.setLevel(logging.ERROR)
+error_fh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+logger.addHandler(error_fh)
+# for errors, log to stderr as well
+error_sh = logging.StreamHandler()
+error_sh.setLevel(logging.ERROR)
+error_sh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+logger.addHandler(error_sh)
+
 # set env vars
 website_url = os.environ['WEBSITE_URL']
 login_username = os.environ['USERNAME']
@@ -27,6 +49,7 @@ mailgun_api_key = os.environ['MAILGUN_API_KEY']
 mailgun_url = os.environ['MAILGUN_URL']
 email_from_str = os.environ['EMAIL_FROM']
 email_to_str = os.environ['EMAIL_TO']
+email_cc_str = os.getenv('EMAIL_CC')  # optional field
 
 # set up chrome options
 chrome_options = Options()
@@ -46,30 +69,33 @@ def send_email(res_str: str):
         auth=('api', mailgun_api_key),
         data={'from': email_from_str,
               'to': email_to_str,
+              'cc': email_cc_str,
               'subject': f'NB User Count {sg_curr_time}',
               'text': res_str})
 
 
 def scrape_and_email():
     # access the website
-    driver.get(website_url)
+    try:
+        driver.get(website_url)
+    except Exception as e:
+        logger.error(f'Error accessing website: {e}')
+        return
 
     # input username and password if available
     try:
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "login-page")))
-        print('Login page found')
         username = driver.find_element(by=By.NAME, value="usernameOrEmailAddress")
         password = driver.find_element(by=By.ID, value="Password")
         username.send_keys(login_username)
         password.send_keys(login_password)
         driver.find_element(by=By.ID, value="LoginButton").click()
     except:
-        print('No login page, skipping...')
+        logger.info('No login page, skipping...')
         pass
 
     # wait for the page to load
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "analytic-item")))
-    print('Homepage found')
 
     # find the html tags
     analytic_items = driver.find_elements(by=By.CLASS_NAME, value="analytic-item")
@@ -84,9 +110,13 @@ def scrape_and_email():
         res += f'{label}: {value}\n'
 
     # navigate to the "Community" page
-    driver.get(f"{website_url}/Community")
+    try:
+        driver.get(f"{website_url}/Community")
+    except Exception as e:
+        logger.error(f'Error accessing Community page: {e}')
+        return
+
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "CommunityTable")))
-    print('Community page found')
     # get text from class card-footer-item of community_list
     community_list_footer = driver.find_element(
         by=By.ID, value="CommunityListContent").find_element(
@@ -98,13 +128,18 @@ def scrape_and_email():
     res += f"Communities: {community_list_footer_data.split('of ', 1)[1].split(' entries', 1)[0]}\n"
 
     # print the data
-    print(res)
+    logger.info(res.replace('\n', ', '))
 
     # close the driver
     driver.close()
 
     # send email
-    send_email(res)
+    try:
+        send_email(res)
+    except Exception as e:
+        logger.error(f'Error sending email: {e}')
+        return
+    logger.info('Email sent')
 
 
 def schedule_task():
