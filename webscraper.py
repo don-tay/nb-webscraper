@@ -56,10 +56,6 @@ chrome_options = Options()
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument("--headless")
 
-# set up chrome driver
-# ! NB: adjust accordingly to your own path, or use webdriver_manager
-driver = webdriver.Chrome(service=Service(), options=chrome_options)
-
 
 def send_email(res_str: str):
     # email data with mailgun API
@@ -75,6 +71,9 @@ def send_email(res_str: str):
 
 
 def scrape_and_email():
+    # set up chrome driver
+    # ! NB: adjust accordingly to your own path, or use webdriver_manager
+    driver = webdriver.Chrome(service=Service(), options=chrome_options)
     # access the website
     try:
         driver.get(website_url)
