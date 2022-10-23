@@ -17,6 +17,9 @@ Schedulable web scraping tool in Python + Selenium.
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+
+# Alternatively, run with docker
+./bootstrap.sh
 ```
 
 ## Running the app
