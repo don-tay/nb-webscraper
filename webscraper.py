@@ -73,7 +73,7 @@ def send_email(res_str: str):
 def scrape_and_email():
     # set up chrome driver
     # ! NB: adjust accordingly to your own path, or use webdriver_manager
-    driver = webdriver.Chrome(service=Service('/usr/lib/chromium-browser/chromedriver'), options=chrome_options)
+    driver = webdriver.Chrome(service=Service('/usr/bin/chromedriver'), options=chrome_options)
     # access the website
     try:
         driver.get(website_url)
