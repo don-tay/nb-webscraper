@@ -12,7 +12,6 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 import requests
 import schedule
 from dotenv import load_dotenv
@@ -57,10 +56,6 @@ chrome_options = Options()
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument("--headless")
 
-# set up chrome driver
-# ! NB: adjust accordingly to your own path, or use webdriver_manager
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
-
 
 def send_email(res_str: str):
     # email data with mailgun API
@@ -76,6 +71,9 @@ def send_email(res_str: str):
 
 
 def scrape_and_email():
+    # set up chrome driver
+    # ! NB: adjust accordingly to your own path, or use webdriver_manager
+    driver = webdriver.Chrome(service=Service('/usr/bin/chromedriver'), options=chrome_options)
     # access the website
     try:
         driver.get(website_url)
