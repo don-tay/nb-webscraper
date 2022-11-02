@@ -101,12 +101,17 @@ def scrape_and_email():
 
     # store data as string, delimited by newline
     res = ''
+    total_value = 0
 
     # insert first 2 items of analytics-item
     for item in analytic_items[:2]:
         label = item.find_element(by=By.CLASS_NAME, value="tag-name").text
         value = item.find_element(by=By.CLASS_NAME, value="tag-value").text
         res += f'{label}: {value}\n'
+        total_value += int(value)
+
+    # insert total value
+    res += f'Total: {total_value}\n'
 
     # navigate to the "Community" page
     try:
