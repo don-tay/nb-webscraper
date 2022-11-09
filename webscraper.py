@@ -4,7 +4,6 @@
 from datetime import datetime
 import logging
 import os
-import time
 from zoneinfo import ZoneInfo
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -13,7 +12,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import requests
-import schedule
 from dotenv import load_dotenv
 
 # load dotenv file
@@ -42,7 +40,6 @@ logger.addHandler(error_sh)
 
 # set env vars
 website_url = os.environ['WEBSITE_URL']
-run_schedule_time = os.environ['RUN_SCHEDULE_TIME']
 login_username = os.environ['USERNAME']
 login_password = os.environ['PASSWORD']
 mailgun_api_key = os.environ['MAILGUN_API_KEY']
@@ -146,14 +143,5 @@ def scrape_and_email():
     logger.info('Email sent')
 
 
-def schedule_task():
-    # ! adjust schedule according to timezone
-    schedule.every().day.at(run_schedule_time).do(scrape_and_email)
-
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-
 if __name__ == '__main__':
-    schedule_task()
+    scrape_and_email()
