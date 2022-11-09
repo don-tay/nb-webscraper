@@ -40,7 +40,6 @@ logger.addHandler(error_sh)
 
 # set env vars
 website_url = os.environ['WEBSITE_URL']
-run_schedule_time = os.environ['RUN_SCHEDULE_TIME']
 login_username = os.environ['USERNAME']
 login_password = os.environ['PASSWORD']
 mailgun_api_key = os.environ['MAILGUN_API_KEY']
